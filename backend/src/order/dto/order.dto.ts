@@ -1,5 +1,3 @@
-import { ErrorData } from '../../exсeptions/error.codes';
-
 export class TicketDTO {
   film: string;
   session: string;

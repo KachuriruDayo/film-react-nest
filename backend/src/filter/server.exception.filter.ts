@@ -2,7 +2,6 @@ import {
   ArgumentsHost,
   Catch,
   ExceptionFilter,
-  HttpStatus,
 } from '@nestjs/common';
 import { ServerException } from '../exсeptions/server.exception';
 
