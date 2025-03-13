@@ -98,7 +98,7 @@ export class FilmsRepository {
     }
 
     let i = 0;
-    result.error ? (i = ticketsLength + 1) : null;
+    if (result.error) return result;
 
     while (i < ticketsLength) {
       const ticket = items[i];
