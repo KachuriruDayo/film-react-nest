@@ -18,7 +18,7 @@ import { OrderModule } from './order/order.module';
       rootPath: path.join(__dirname, '..', 'public'),
     }),
     TypeOrmModule.forRoot({
-      type: 'postgres',
+      type: process.env.DATABASE_DRIVER as any,
       host: 'localhost',
       port: parseInt(process.env.MAIN_DB_PORT),
       username: process.env.MAIN_DB_USERNAME,
