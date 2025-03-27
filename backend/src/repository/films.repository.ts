@@ -1,9 +1,12 @@
 import { Injectable } from '@nestjs/common';
-import mongoose, { Schema } from 'mongoose';
+import { Repository } from 'typeorm';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Films } from '../entity/films.entity';
+import { Schedules } from '../entity/schedules.entity';
+
 import {
   GetFilmDto,
   GetFilmsDto,
-  GetScheduleDto,
   GetScheduleResDto,
 } from '../films/dto/films.dto';
 import {
@@ -20,34 +23,16 @@ interface Response<Type> {
   error: ErrorData | null;
 }
 
-const ScheduleSchema = new Schema({
-  id: { type: String, required: true },
-  daytime: { type: Date, required: true },
-  hall: { type: Number, required: true },
-  rows: { type: Number, required: true },
-  seats: { type: Number, required: true },
-  price: { type: Number, required: true },
-  taken: { type: [String], required: true },
-});
-
-const FilmSchema = new Schema({
-  id: { type: String, required: true },
-  rating: { type: Number, required: true },
-  director: { type: String, required: true },
-  tags: { type: [String], required: true },
-  image: { type: String, required: true },
-  cover: { type: String, required: true },
-  title: { type: String, required: true },
-  about: { type: String, required: true },
-  description: { type: String, required: true },
-  schedule: { type: [ScheduleSchema], required: true },
-});
-
-const Film = mongoose.model('Film', FilmSchema);
-
 @Injectable()
 export class FilmsRepository {
-  private getFilmMapperFn(): (Film) => GetFilmDto {
+  constructor(
+    @InjectRepository(Films)
+    private readonly filmsRepository: Repository<Films>,
+    @InjectRepository(Schedules)
+    private readonly schedulesRepository: Repository<Schedules>,
+  ) {}
+
+  private getFilmMapperFn(): (items) => GetFilmDto {
     return (root) => {
       return {
         id: root.id,
@@ -61,20 +46,6 @@ export class FilmsRepository {
         description: root.description,
       };
     };
-  }
-
-  private getScheduleMapperFn(item): GetScheduleDto[] {
-    return item.schedule.map((el) => {
-      return {
-        id: el.id,
-        daytime: el.daytime,
-        hall: el.hall,
-        rows: el.rows,
-        seats: el.seats,
-        price: el.price,
-        taken: el.taken,
-      };
-    });
   }
 
   private async createOrderFn(
@@ -102,15 +73,16 @@ export class FilmsRepository {
 
     while (i < ticketsLength) {
       const ticket = items[i];
-      const film = await Film.findOne({ id: ticket.film });
-      if (!film) {
+      if (!(await this.filmsRepository.findOneBy({ id: ticket.film }))) {
         result.error = {
           status: ErrorCode.BadRequest,
           message: `Film id:${ticket.film} in ticket is incorrect`,
         };
         break;
       }
-      const schedule = film.schedule.find((item) => item.id === ticket.session);
+      const schedule = await this.schedulesRepository.findOneBy({
+        id: ticket.session,
+      });
       if (!schedule) {
         result.error = {
           status: ErrorCode.BadRequest,
@@ -126,7 +98,9 @@ export class FilmsRepository {
         break;
       }
       if (
-        schedule.taken.find((item) => item === `${ticket.row}:${ticket.seat}`)
+        schedule.taken
+          .split(',')
+          .find((item) => item === `${ticket.row}:${ticket.seat}`)
       ) {
         result.error = {
           status: ErrorCode.BadRequest,
@@ -143,10 +117,18 @@ export class FilmsRepository {
 
     while (j < ticketsLength) {
       const ticket = items[j];
-      await Film.findOneAndUpdate(
-        { id: ticket.film, 'schedule.id': ticket.session },
-        { $addToSet: { 'schedule.$.taken': `${ticket.row}:${ticket.seat}` } },
-      );
+      const schedule = await this.schedulesRepository.findOneBy({
+        id: ticket.session,
+      });
+      if (schedule.taken === '') {
+        await this.schedulesRepository.update(ticket.session, {
+          taken: `${ticket.row}:${ticket.seat}`,
+        });
+      } else {
+        await this.schedulesRepository.update(ticket.session, {
+          taken: schedule.taken + ',' + `${ticket.row}:${ticket.seat}`,
+        });
+      }
 
       result.data.push({
         film: ticket.film,
@@ -165,7 +147,7 @@ export class FilmsRepository {
   }
 
   async findAll(): Promise<Response<GetFilmsDto>> {
-    const items = await Film.find({});
+    const items = await this.filmsRepository.find();
     if (items.length === 0)
       return {
         data: null,
@@ -174,7 +156,7 @@ export class FilmsRepository {
           message: 'Films in database is not found',
         },
       };
-    const total = await Film.countDocuments({});
+    const total = items.length;
     return {
       data: {
         total,
@@ -193,8 +175,13 @@ export class FilmsRepository {
           message: 'id is empty',
         },
       };
-    const item = await Film.findOne({ id: id });
-    if (!item)
+    const schedules = await this.schedulesRepository.find({
+      where: { filmId: id },
+      order: {
+        daytime: 'asc',
+      },
+    });
+    if (!schedules)
       return {
         data: null,
         error: {
@@ -202,11 +189,10 @@ export class FilmsRepository {
           message: 'Film id:${id} is incorrect',
         },
       };
-    const schedule = this.getScheduleMapperFn(item);
     return {
       data: {
-        total: schedule.length,
-        items: schedule,
+        total: schedules.length,
+        items: schedules,
       },
       error: null,
     };

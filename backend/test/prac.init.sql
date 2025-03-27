@@ -1,7 +1,7 @@
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
-create database prac
-    with owner prac;
+create database nest_project
+    with owner student;
 
 create table public.films
 (
@@ -19,7 +19,7 @@ create table public.films
 );
 
 alter table public.films
-    owner to prac;
+    owner to student;
 
 create table public.schedules
 (
@@ -38,6 +38,6 @@ create table public.schedules
 );
 
 alter table public.schedules
-    owner to prac;
+    owner to student;
 
 
