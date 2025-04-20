@@ -4,6 +4,7 @@ import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import * as path from 'node:path';
 import * as process from 'node:process';
+import 'dotenv/config';
 
 import { FilmsModule } from './films/films.module';
 import { OrderModule } from './order/order.module';
