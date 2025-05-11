@@ -19,7 +19,8 @@ type Story = StoryObj<typeof meta>;
 
 export const Default: Story = {
   args: {
+    id: 'test',
     image: `${CDN_URL}/bg1s.jpg`,
-    text: 'Архитекторы общества',
+    title: 'Архитекторы общества',
   },
 };

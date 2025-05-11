@@ -39,5 +39,3 @@ create table public.schedules
 
 alter table public.schedules
     owner to student;
-
-

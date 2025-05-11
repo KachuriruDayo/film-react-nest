@@ -20,7 +20,7 @@ import { OrderModule } from './order/order.module';
       imports: [ConfigModule.forRoot()],
       useFactory: (config: ConfigService) => ({
         type: config.get<any>('DATABASE_DRIVER'),
-        host: 'localhost',
+        host: config.get<string>('MAIN_DB_HOST'),
         port: config.get<number>('MAIN_DB_PORT'),
         username: config.get<string>('MAIN_DB_USERNAME'),
         password: config.get<string>('MAIN_DB_PASSWORD'),
