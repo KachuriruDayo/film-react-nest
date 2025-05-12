@@ -4,12 +4,11 @@ env:
 
 name: publish
 on:
-  push:
-    branches: ['review-2']
+  push
 jobs:
   build-and-publish-latest:
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/master'
+    if: github.ref == 'refs/heads/review-2'
 
     steps:
       - uses: actions/checkout@v4 # Checking out the repo
