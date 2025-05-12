@@ -1,6 +1,7 @@
 env:
   REGISTRY: ghcr.io
-  IMAGE_NAME: ${{ github.repository }}
+  FRONT_IMAGE_NAME: frontend
+  BACK_IMAGE_NAME: backend
 
 name: publish
 on:
@@ -8,6 +9,9 @@ on:
 jobs:
   build-and-publish-latest:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
     if: github.ref == 'refs/heads/review-2'
 
     steps:
@@ -23,7 +27,7 @@ jobs:
         id: meta
         uses: docker/metadata-action@9ec57ed1fcdbf14dcef7dfbe97b2010124a938b7
         with:
-          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          images: ${{ env.REGISTRY }}/${{ env.FRONT_IMAGE_NAME }}
 
       - name: Build and push Docker image
         uses: docker/build-push-action@f2a1d5e99d037542a71f64918e516c093c6f3fc4
@@ -32,6 +36,12 @@ jobs:
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
+
+      - name: Extract metadata (tags, labels) for Docker
+        id: meta
+        uses: docker/metadata-action@9ec57ed1fcdbf14dcef7dfbe97b2010124a938b7
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.BACK_IMAGE_NAME }}
 
       - name: Build and push Docker image
         uses: docker/build-push-action@f2a1d5e99d037542a71f64918e516c093c6f3fc4
