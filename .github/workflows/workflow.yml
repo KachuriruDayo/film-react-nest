@@ -5,7 +5,7 @@ env:
 name: publish
 on:
   push:
-    branches: ['main']
+    branches: ['review-2']
 jobs:
   build-and-publish-latest:
     runs-on: ubuntu-latest
