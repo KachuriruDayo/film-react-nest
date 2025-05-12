@@ -3,7 +3,10 @@ env:
   IMAGE_NAME: ${{ github.repository }}
 
 name: publish
-on: [push]
+on:
+  push:
+    branches: ['main']
+  
 jobs:
   build-and-publish-latest:
     runs-on: ubuntu-latest
