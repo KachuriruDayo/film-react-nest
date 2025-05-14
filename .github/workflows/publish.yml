@@ -17,9 +17,9 @@ jobs:
       matrix:
         include:
           - image: ghcr.io/nestjs-app
-            dockerfile: ../backend/Dockerfile
+            dockerfile: backend/Dockerfile
           - image: ghcr.io/react-app
-            dockerfile: ../frontend/Dockerfile
+            dockerfile: frontend/Dockerfile
     steps:
       - uses: actions/checkout@v4 # Checking out the repo
       - name: Log in to the Container registry
