@@ -16,9 +16,9 @@ jobs:
     strategy:
       matrix:
         include:
-          - image: ${{ env.REGISTRY }}/${{ env.BACKEND }}
+          - image: ghcr.io/${{ env.BACKEND }}
             dockerfile: ../backend/Dockerfile
-          - image: ${{ env.REGISTRY }}/${{ env.FRONTEND }}
+          - image: ghcr.io/${{ env.FRONTEND }}
             dockerfile: ../frontend/Dockerfile
     steps:
       - uses: actions/checkout@v4 # Checking out the repo
