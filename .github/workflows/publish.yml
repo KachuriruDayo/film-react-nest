@@ -16,9 +16,9 @@ jobs:
     strategy:
       matrix:
         include:
-          - image: ghcr.io/${{ env.BACKEND }}
+          - image: ghcr.io/nestjs-app
             dockerfile: ../backend/Dockerfile
-          - image: ghcr.io/${{ env.FRONTEND }}
+          - image: ghcr.io/react-app
             dockerfile: ../frontend/Dockerfile
     steps:
       - uses: actions/checkout@v4 # Checking out the repo
