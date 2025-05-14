@@ -1,7 +1,7 @@
 env:
   REGISTRY: ghcr.io
-  FRONT_IMAGE_NAME: frontend
-  BACK_IMAGE_NAME: backend
+  BACKEND: nestjs-app
+  FRONTEND: react-app
 
 name: publish
 on:
@@ -13,7 +13,13 @@ jobs:
       contents: read
       packages: write
     if: github.ref == 'refs/heads/review-2'
-
+    strategy:
+      matrix:
+        include:
+          - image: ${{ env.REGISTRY }}/${{ env.BACKEND }}
+            dockerfile: ../backend/Dockerfile
+          - image: ${{ env.REGISTRY }}/${{ env.FRONTEND }}
+            dockerfile: ../frontend/Dockerfile
     steps:
       - uses: actions/checkout@v4 # Checking out the repo
       - name: Log in to the Container registry
@@ -22,31 +28,15 @@ jobs:
           registry: ${{ env.REGISTRY }}
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
-
       - name: Extract metadata (tags, labels) for Docker
-        id: meta
-        uses: docker/metadata-action@9ec57ed1fcdbf14dcef7dfbe97b2010124a938b7
+        uses: docker/metadata-action@v4
         with:
-          images: ${{ env.REGISTRY }}/${{ env.FRONT_IMAGE_NAME }}
-
-      - name: Build and push Docker image
-        uses: docker/build-push-action@f2a1d5e99d037542a71f64918e516c093c6f3fc4
+          images: ${{ matrix.image }}
+      - name: Build and push
+        uses: docker/build-push-action@v4
         with:
-          context: ./frontend
-          push: true
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
-
-      - name: Extract metadata (tags, labels) for Docker
-        id: meta
-        uses: docker/metadata-action@9ec57ed1fcdbf14dcef7dfbe97b2010124a938b7
-        with:
-          images: ${{ env.REGISTRY }}/${{ env.BACK_IMAGE_NAME }}
-
-      - name: Build and push Docker image
-        uses: docker/build-push-action@f2a1d5e99d037542a71f64918e516c093c6f3fc4
-        with:
-          context: ./backend
+          context: .
+          file: ${{ matrix.dockerfile }}
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
