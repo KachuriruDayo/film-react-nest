@@ -1,6 +1,6 @@
 FROM node:20-alpine AS builder
 WORKDIR /var/www/app
-COPY package*.json ./
+COPY package.json package-lock.json ./
 RUN npm i
 COPY . .
 
