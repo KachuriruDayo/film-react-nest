@@ -18,10 +18,10 @@ jobs:
         include:
           - image: ghcr.io/nestjs-app
             dockerfile: backend/Dockerfile
-            path: ../../backend
+            path: ./backend
           - image: ghcr.io/react-app
             dockerfile: frontend/Dockerfile
-            path: ../../frontend
+            path: ./frontend
     steps:
       - uses: actions/checkout@v4 # Checking out the repo
       - name: Log in to the Container registry
