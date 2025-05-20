@@ -1,7 +1,5 @@
 env:
   REGISTRY: ghcr.io
-  BACKEND: nestjs-app
-  FRONTEND: react-app
 
 name: publish
 on:
@@ -16,10 +14,10 @@ jobs:
     strategy:
       matrix:
         include:
-          - image: ${{ env.REGISTRY }}/KachuriruDayo/${{ env.BACKEND }}
+          - image: ${{ secrets.BACKEND_IMAGE_NAME }}
             dockerfile: backend/Dockerfile
             path: ./backend
-          - image: ${{ env.REGISTRY }}/KachuriruDayo/${{ env.FRONTEND }}
+          - image: ${{ secrets.FRONTEND_IMAGE_NAME }}
             dockerfile: frontend/Dockerfile
             path: ./frontend
     steps:
