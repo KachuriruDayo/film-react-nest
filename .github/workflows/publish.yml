@@ -12,14 +12,13 @@ jobs:
     permissions:
       contents: read
       packages: write
-    if: github.ref == 'refs/heads/review-2'
     strategy:
       matrix:
         include:
-          - image: ghcr.io/nestjs_app
+          - image: ghcr.io/KachuriruDayo/nestjs_app
             dockerfile: backend/Dockerfile
             path: ./backend
-          - image: ghcr.io/react_app
+          - image: ghcr.io/KachuriruDayo/react_app
             dockerfile: frontend/Dockerfile
             path: ./frontend
     steps:
