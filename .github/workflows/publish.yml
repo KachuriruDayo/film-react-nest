@@ -1,5 +1,7 @@
 env:
   REGISTRY: ghcr.io
+  FRONTEND_IMAGE: ${{ secrets.BACKEND_IMAGE_NAME }}
+  BACKEND_IMAGE: ${{ secrets.FRONTEND_IMAGE_NAME }}
 
 name: publish
 on:
@@ -14,10 +16,10 @@ jobs:
     strategy:
       matrix:
         include:
-          - image: ${{ secrets.BACKEND_IMAGE_NAME }}
+          - image: ${{ env.BACKEND_IMAGE }}
             dockerfile: backend/Dockerfile
             path: ./backend
-          - image: ${{ secrets.FRONTEND_IMAGE_NAME }}
+          - image: ${{ env.FRONTEND_IMAGE }}
             dockerfile: frontend/Dockerfile
             path: ./frontend
     steps:
