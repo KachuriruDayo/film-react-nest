@@ -1,7 +1,5 @@
 env:
   REGISTRY: ghcr.io
-  FRONTEND_IMAGE: ${{ secrets.BACKEND_IMAGE_NAME }}
-  BACKEND_IMAGE: ${{ secrets.FRONTEND_IMAGE_NAME }}
 
 name: publish
 on:
@@ -9,17 +7,17 @@ on:
 jobs:
   build-and-publish-latest:
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/review-2'
+    if: github.ref == 'refs/heads/main'
     permissions:
       contents: read
       packages: write
     strategy:
       matrix:
         include:
-          - image: ${{ env.BACKEND_IMAGE }}
+          - image: ghcr.io/KachuriruDayo/nestjs-app
             dockerfile: backend/Dockerfile
             path: ./backend
-          - image: ${{ env.FRONTEND_IMAGE }}
+          - image: ghcr.io/KachuriruDayo/react-app
             dockerfile: frontend/Dockerfile
             path: ./frontend
     steps:
