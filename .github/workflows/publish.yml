@@ -16,10 +16,10 @@ jobs:
     strategy:
       matrix:
         include:
-          - image: ghcr.io/nestjs-app
+          - image: ghcr.io/nestjs_app
             dockerfile: backend/Dockerfile
             path: ./backend
-          - image: ghcr.io/react-app
+          - image: ghcr.io/react_app
             dockerfile: frontend/Dockerfile
             path: ./frontend
     steps:
