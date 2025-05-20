@@ -9,17 +9,17 @@ on:
 jobs:
   build-and-publish-latest:
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main'
+    if: github.ref == 'refs/heads/review-2'
     permissions:
       contents: read
       packages: write
     strategy:
       matrix:
         include:
-          - image: ghcr.io/KachuriruDayo/nestjs_app
+          - image: ${{ env.REGISTRY }}/KachuriruDayo/${{ env.BACKEND }}
             dockerfile: backend/Dockerfile
             path: ./backend
-          - image: ghcr.io/KachuriruDayo/react_app
+          - image: ${{ env.REGISTRY }}/KachuriruDayo/${{ env.FRONTEND }}
             dockerfile: frontend/Dockerfile
             path: ./frontend
     steps:
