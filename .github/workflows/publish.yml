@@ -18,8 +18,10 @@ jobs:
         include:
           - image: ghcr.io/nestjs-app
             dockerfile: backend/Dockerfile
+            path: ../../backend
           - image: ghcr.io/react-app
             dockerfile: frontend/Dockerfile
+            path: ../../frontend
     steps:
       - uses: actions/checkout@v4 # Checking out the repo
       - name: Log in to the Container registry
@@ -38,7 +40,7 @@ jobs:
       - name: Build and push Docker image
         uses: docker/build-push-action@f2a1d5e99d037542a71f64918e516c093c6f3fc4
         with:
-          context: .
+          context: ${{matrix.path}}
           file: ${{ matrix.dockerfile }}
           push: true
           tags: ${{ steps.meta.outputs.tags }}
