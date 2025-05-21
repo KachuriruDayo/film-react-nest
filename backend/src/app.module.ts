@@ -1,10 +1,8 @@
 import { Module } from '@nestjs/common';
 import { ServeStaticModule } from '@nestjs/serve-static';
-import { ConfigModule } from '@nestjs/config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import * as path from 'node:path';
-import * as process from 'node:process';
-import 'dotenv/config';
 
 import { FilmsModule } from './films/films.module';
 import { OrderModule } from './order/order.module';
@@ -18,15 +16,19 @@ import { OrderModule } from './order/order.module';
     ServeStaticModule.forRoot({
       rootPath: path.join(__dirname, '..', 'public'),
     }),
-    TypeOrmModule.forRoot({
-      type: process.env.DATABASE_DRIVER as any,
-      host: 'localhost',
-      port: parseInt(process.env.MAIN_DB_PORT),
-      username: process.env.MAIN_DB_USERNAME,
-      password: process.env.MAIN_DB_PASSWORD,
-      database: process.env.MAIN_DB_DATABASE_NAME,
-      entities: [__dirname + '/entity/*{.js,.ts}'],
-      synchronize: true,
+    TypeOrmModule.forRootAsync({
+      imports: [ConfigModule.forRoot()],
+      useFactory: (config: ConfigService) => ({
+        type: config.get<any>('DATABASE_DRIVER'),
+        host: config.get<string>('MAIN_DB_HOST'),
+        port: config.get<number>('MAIN_DB_PORT'),
+        username: config.get<string>('MAIN_DB_USERNAME'),
+        password: config.get<string>('MAIN_DB_PASSWORD'),
+        database: config.get<string>('MAIN_DB_DATABASE_NAME'),
+        entities: [__dirname + '/entity/*{.js,.ts}'],
+        synchronize: true,
+      }),
+      inject: [ConfigService],
     }),
     FilmsModule,
     OrderModule,
