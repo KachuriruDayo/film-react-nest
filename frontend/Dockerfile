@@ -1,7 +1,7 @@
 FROM node:20-alpine AS builder
 WORKDIR /var/www/app
 COPY package.json package-lock.json ./
-RUN npm i
+RUN npm ci
 COPY . .
 
 ARG VITE_API_URL="http://localhost/api/afisha"
